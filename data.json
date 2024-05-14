@@ -1,0 +1,15 @@
+{
+    "languages": {
+        "ru-ru": {
+            "name": "Русский",
+            "emoji": "🇷🇺",
+            "file": "ru-ru.txt"
+        },
+        "en-us": {
+            "name": "Английский",
+            "emoji": "🇺🇸",
+            "file": "en-us.txt"
+        }
+    },
+    "default_language": "ru-ru"
+}
