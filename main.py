@@ -377,6 +377,54 @@ async def skip_word(inter: discord.Interaction):
 
 
 
+# end turn word callback
+
+async def end_turn(inter: discord.Interaction):
+    # checking for ongoing game
+    game = mg.get_game(inter.channel_id)
+    if game == None:
+        embed = discord.Embed(
+            description=f'🚫 В этом канале сейчас никто не играет!',
+            color=discord.Color.red()
+        )
+        await inter.response.send_message(embed=embed, ephemeral=True)
+        return
+    
+    # checking if some sneaky ass pressed the button
+    if game.starter_id != inter.user.id:
+        embed = discord.Embed(
+            description=f'🚫 Не для тебя моя кнопочка росла',
+            color=discord.Color.red()
+        )
+        await inter.response.send_message(embed=embed, ephemeral=True)
+        return
+    
+    # ending game
+    mg.games.pop(game.channel_id)
+    log(f'{inter.user.id} removed game in {game.channel_id}')
+    
+    # creating view
+    view = discord.ui.View()
+
+    new_game_btn = discord.ui.Button(
+        style=discord.ButtonStyle.blurple,
+        label='Играть ещё',
+        emoji='🎮'
+    )
+    new_game_btn.callback = new_game
+    view.add_item(new_game_btn)
+
+    # sending the message
+    embed = discord.Embed(
+        description=f'🤚 <@{game.starter_id}> пропустил свой ход!',
+        color=discord.Color.green()
+    )
+    
+    await inter.response.send_message(embed=embed, view=view)
+
+
+
+
 # new game callback
 
 async def new_game(inter: discord.Interaction):
@@ -436,10 +484,9 @@ async def new_game(inter: discord.Interaction):
     turn_btn = discord.ui.Button(
         style=discord.ButtonStyle.red,
         label='Пропустить ход',
-        emoji='❌',
-        disabled=True
+        emoji='❌'
     )
-    # turn_btn.callback
+    turn_btn.callback = end_turn
     view.add_item(turn_btn)
 
     # creating embed
@@ -451,6 +498,120 @@ async def new_game(inter: discord.Interaction):
         embed.set_footer(text=utils.events_to_text(inter.user.name, events))
 
     await inter.channel.send(embed=embed, view=view)
+
+
+
+# change word command
+
+@bot.hybrid_command(
+    name='change-word', description='Пропускает ваш ход.',
+    aliases=['changeword','change_word','change','cw']
+)
+async def changeword(ctx:commands.Context):
+    log(f'{ctx.author.id} ran {PREFIX}change-word')
+
+    # checking for ongoing game
+    game = mg.get_game(ctx.channel.id)
+    if game == None:
+        embed = discord.Embed(
+            description=f'🚫 В этом канале сейчас никто не играет!',
+            color=discord.Color.red()
+        )
+        await ctx.reply(embed=embed)
+        return
+    
+    # checking if some sneaky ass pressed the button
+    if game.starter_id != ctx.author.id:
+        embed = discord.Embed(
+            description=f'🚫 Не для тебя моя команда росла',
+            color=discord.Color.red()
+        )
+        await ctx.reply(embed=embed)
+        return
+    
+    # changing word
+    word, events = mg.new_word(ctx.author.id, ctx.channel.id, ctx.guild.id)
+    log(f'{ctx.author.id} changed word to {word}')
+    
+    # creating view
+    view = discord.ui.View()
+
+    view_btn = discord.ui.Button(
+        style=discord.ButtonStyle.blurple,
+        label='Посмотреть слово',
+        emoji='📜'
+    )
+    view_btn.callback = view_word
+    view.add_item(view_btn)
+
+    skip_btn = discord.ui.Button(
+        style=discord.ButtonStyle.gray,
+        label='Новое слово',
+        emoji='⏩'
+    )
+    skip_btn.callback = skip_word
+    view.add_item(skip_btn)
+
+    # sending the new word
+    embed = discord.Embed(
+        description=f'📜 Нажми на кнопку, чтобы посмотреть новое слово',
+        color=discord.Color.green()
+    )
+    if events != []:
+        embed.set_footer(text=utils.events_to_text(ctx.author.name, events))
+    await ctx.reply(embed=embed, view=view)
+
+
+
+# skip turn command
+
+@bot.hybrid_command(
+    name='skip', description='Пропускает ваш ход.',
+    aliases=['stop']
+)
+async def skip(ctx:commands.Context):
+    log(f'{ctx.author.id} ran {PREFIX}skip')
+
+    # checking for ongoing game
+    game = mg.get_game(ctx.channel.id)
+    if game == None:
+        embed = discord.Embed(
+            description=f'🚫 В этом канале сейчас никто не играет!',
+            color=discord.Color.red()
+        )
+        await ctx.reply(embed=embed)
+        return
+    
+    # checking if some sneaky ass pressed the button
+    if game.starter_id != ctx.author.id:
+        embed = discord.Embed(
+            description=f'🚫 Не для тебя моя команда росла',
+            color=discord.Color.red()
+        )
+        await ctx.reply(embed=embed)
+        return
+    
+    # ending game
+    mg.games.pop(game.channel_id)
+    log(f'{ctx.author.id} removed game in {game.channel_id}')
+    
+    # creating view
+    view = discord.ui.View()
+
+    new_game_btn = discord.ui.Button(
+        style=discord.ButtonStyle.blurple,
+        label='Играть ещё',
+        emoji='🎮'
+    )
+    new_game_btn.callback = new_game
+    view.add_item(new_game_btn)
+
+    # sending the message
+    embed = discord.Embed(
+        description=f'🤚 <@{game.starter_id}> пропустил свой ход!',
+        color=discord.Color.green()
+    )
+    await ctx.reply(embed=embed, view=view)
 
 
 
@@ -512,10 +673,9 @@ async def start(ctx:commands.Context):
     turn_btn = discord.ui.Button(
         style=discord.ButtonStyle.red,
         label='Пропустить ход',
-        emoji='❌',
-        disabled=True
+        emoji='❌'
     )
-    # turn_btn.callback
+    turn_btn.callback = end_turn
     view.add_item(turn_btn)
 
     # creating embed
@@ -636,26 +796,30 @@ async def leaders(ctx:commands.Context, places:int=10):
         return
     
     # getting leaders
-    leaders = mg.guilds[ctx.guild.id].get_leaderboard(places)
+    guild = mg.guilds[ctx.guild.id]
+    leaders = guild.get_leaderboard(places)
     leader_text = ''
 
-    place = 1
+    place = 0
     old_amount = 0
 
     for id, amount in leaders.items():
-        text = ['`🥇`','`🥈`','`🥉`']\
-            [place-1] if place <= 3 else f'`#{place}`'
-        leader_text += f'{text} <@{id}>  -  **`{amount}`**\n'
-
         if old_amount != amount:
             place += 1
             old_amount = amount
+
+        text = ['`🥇`','`🥈`','`🥉`']\
+            [place-1] if place <= 3 else f'`#{place}`'
+        leader_text += f'{text} <@{id}>  -  **`{amount}`**\n'
 
     embed = discord.Embed(color=discord.Color.green())
     embed.add_field(
         name=f'Таблица лидеров {ctx.guild.name} по угадываниям',
         value=leader_text
     )
+    embed.set_footer(
+        text=f'Всего людей: {len(guild.leaderboard)}\n'\
+            f'Всего угадываний: {guild.total_words_guessed}')
     await ctx.reply(embed=embed)
 
 

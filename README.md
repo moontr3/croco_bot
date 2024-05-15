@@ -37,10 +37,10 @@ Other players can vote on the explanation. For each like the explainer gets 1 XP
 - [x] Basic balance and stats
 - [x] Server leaderboard of guesses
 - [x] Transferring moonrocks
-- [ ] Ability to skip your turn
-- [ ] Text/slash commands for skipping the turn or changing the word 
+- [x] Ability to skip your turn
+- [x] Text/slash commands for skipping the turn or changing the word 
 - [ ] Shop with XP boosts
-- [ ] Global leaderboard of XP
+- [ ] ~~Global leaderboard of XP~~ hella cheaters out there
 - [ ] Server settings (e.g. changing word list language)
 
 
