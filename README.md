@@ -7,6 +7,7 @@ without saying the word itself or any similar words.
 
 [Click to invite Drafts Croco to your own server](https://discord.com/oauth2/authorize?client_id=1220419189593084044)
 
+> [!WARNING]
 > This bot may not always be online. Depends on my mood and lunar energy affecting my server's workability.
 
 
@@ -17,6 +18,11 @@ without saying the word itself or any similar words.
 - Put your Discord User ID in the admin list in the `config.py` file
 - Launch main.py, should work flawlessly
 
+> [!WARNING]
+> You need to have Message Content Intent enabled in your
+> Discord Dev bot page.
+
+> [!NOTE]
 > Use `c!sync` to sync the slash command tree (only available to bot admins)
 
 
