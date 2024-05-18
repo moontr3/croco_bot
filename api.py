@@ -68,27 +68,27 @@ class Language:
         '''
         Reloads language file.
         '''
-        log(f'Loading language {self.key}...')
+        log(f'Loading language {self.key}...', 'api',)
 
         with open(self.file, encoding='utf-8') as f:
             self.raw: str = f.read()
         
         # getting word list
-        log(f'[{self.key}] Parsing words...')
+        log(f'[{self.key}] Parsing words...', 'api',)
 
         self.words: Set[str] = self.raw.split('\n')
         self.words = {i.lower().replace('ё','е') for i in self.words if i != ''}
         self.word_amount: int = len(self.words)
 
         # filtered list only with words without symbols
-        log(f'[{self.key}] Filtering words...')
+        log(f'[{self.key}] Filtering words...', 'api',)
 
         self.filtered_words: Set[str] = {
             i for i in self.words if i.isalpha()
         }
         self.filtered_word_amount: int = len(self.filtered_words)
 
-        log(f'Language {self.key} loaded', level=SUCCESS)
+        log(f'Language {self.key} loaded', 'api', level=SUCCESS,)
 
 
 # guild
@@ -241,7 +241,7 @@ class Manager:
         self.guilds: Dict[int, Guild] = {}
 
         self.commit()
-        log('Created new database', level=SUCCESS)
+        log('Created new database', 'api', level=SUCCESS)
 
 
     def clone_db(self):
@@ -254,34 +254,34 @@ class Manager:
         with open(f'{self.users_file}.bak', 'w', encoding='utf8') as f:
             f.write(data)
 
-        log(f'Cloned database into {self.users_file}.bak', level=SUCCESS)
+        log(f'Cloned database into {self.users_file}.bak', 'api', level=SUCCESS)
 
 
     def load_data(self):
         '''
         Reloads data.json file.
         '''
-        log('Loading data...')
+        log('Loading data...', 'api')
 
         with open(self.data_file, encoding='utf-8') as f:
             data: dict = json.load(f)
 
         # loading languages
-        log('Parsing languages...')
+        log('Parsing languages...', 'api')
         self.default_language: str = data['default_language']
         self.languages: Dict[str, Language] = {}
 
         for key, lang in data['languages'].items():
             self.languages[key] = Language(key, lang)
 
-        log('Data loaded', level=SUCCESS)
+        log('Data loaded', 'api', level=SUCCESS)
 
 
     def load_users(self):
         '''
         Reloads user.json file.
         '''
-        log('Loading database...')
+        log('Loading database...', 'api')
 
         # checking if file exists
         if not os.path.exists(self.users_file):
@@ -295,22 +295,22 @@ class Manager:
 
         # creating the database if failed
         except Exception as e:
-            log(f'Failed opening the database: {e}', level=ERROR)
+            log(f'Failed opening the database: {e}', 'api', level=ERROR)
             self.clone_db()
             self.new_db()
             return
         
         # parsing users
-        log('Parsing users...')
+        log('Parsing users...', 'api')
         self.users = {int(id): User(id, data) for id, data in raw['users'].items()}
         
         # parsing guilds
-        log('Parsing guilds...')
+        log('Parsing guilds...', 'api')
         self.guilds = {int(id): Guild(
             id, data, self.default_language
         ) for id, data in raw['guilds'].items()}
 
-        log('Database loaded', level=SUCCESS)
+        log('Database loaded', 'api', level=SUCCESS)
 
 
     def commit(self):
@@ -335,7 +335,7 @@ class Manager:
         Checks if user is in database. If not, creates one.
         '''
         if id not in self.users:
-            log(f'Created a new user {id}')
+            log(f'Created a new user {id}', 'api')
             self.users[id] = User(id, {})
             self.commit()
 
@@ -352,7 +352,7 @@ class Manager:
         if id in self.guilds:
             return
         
-        log(f'Created a new guild {id}')
+        log(f'Created a new guild {id}', 'api')
         self.guilds[id] = Guild(id, {}, self.default_language)
         self.commit()
 
@@ -382,7 +382,7 @@ class Manager:
         self.users[id].xp += amount
         self.commit()
 
-        log(f'Added {amount} XP to {id}')
+        log(f'Added {amount} XP to {id}', 'api')
         return self.users[id]
     
 
@@ -426,7 +426,7 @@ class Manager:
         self.users[to_id].moonrocks += amount
         self.commit()
 
-        log(f'Transferred {amount} moonrocks from {from_id} to {to_id}')
+        log(f'Transferred {amount} moonrocks from {from_id} to {to_id}', 'api')
         return 0, amount
     
 
@@ -458,7 +458,7 @@ class Manager:
             self.users[r.explainer_id].likes += 1
             self.commit()
             # adding xp to author
-            log(f'{user_id} liked {game_id}, +1 XP to {r.explainer_id}')
+            log(f'{user_id} liked {game_id}, +1 XP to {r.explainer_id}', 'api')
             self.add_xp(r.explainer_id, 1)
 
         return state 
@@ -491,7 +491,7 @@ class Manager:
             r.dislikes.append(user_id)
             self.users[r.explainer_id].dislikes += 1
             self.commit()
-            log(f'{user_id} disliked {game_id}')
+            log(f'{user_id} disliked {game_id}', 'api')
 
         return state 
 
@@ -555,7 +555,7 @@ class Manager:
             channel_id, message_id, starter_id, word, starter_name
         )
 
-        log(f'{starter_id} started new game in {channel_id} with word {word}')
+        log(f'{starter_id} started new game in {channel_id} with word {word}', 'api')
         self.commit()
         return word, events
     
@@ -567,7 +567,7 @@ class Manager:
         Stops the ongoing game.
         '''
         if channel_id in self.games:
-            log(f'Game in {channel_id} stopped')
+            log(f'Game in {channel_id} stopped', 'api')
             self.games.pop(channel_id)
 
 
@@ -647,5 +647,5 @@ class Manager:
         guesser_events.extend(self.check_user(guesser_id))
 
         self.commit()
-        log(f'{guesser_id} guessed the word {game.word} and got {len(game.word)} XP')
+        log(f'{guesser_id} guessed the word {game.word} and got {len(game.word)} XP', 'api')
         return game, guesser_events, explainer_events
