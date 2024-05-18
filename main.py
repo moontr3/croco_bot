@@ -1,3 +1,4 @@
+import asyncio
 import time
 from config import *
 import api
@@ -6,7 +7,7 @@ import utils
 
 from typing import *
 import discord
-from discord.ext import commands
+from discord.ext import commands,tasks
 
 from dotenv import load_dotenv
 import os
@@ -27,11 +28,63 @@ bot = commands.Bot(
 mg = api.Manager(DATA_FILE, USERS_FILE)
 
 
+
+# tasks
+
+@tasks.loop(seconds=2)
+async def check():
+    # checking games
+    games: List[api.Game] = list(mg.games.values())
+    for game in games:
+        # game expired
+        if game.until <= time.time():
+            # sending message
+            try:
+                # creating embed
+                embed = discord.Embed(
+                    description='🚫 Никто так и не угадал!'\
+                        f'\n\nСлово было - **{game.word}**',
+                    color=discord.Color.red()
+                )
+                embed.set_footer(
+                    text=f'Если что, было {round(config.GAME_LENGTH/60)} минут на ответ.'
+                )
+    
+                # creating view
+                view = discord.ui.View()
+
+                new_game_btn = discord.ui.Button(
+                    style=discord.ButtonStyle.blurple,
+                    label='Играть ещё',
+                    emoji='🎮'
+                )
+                new_game_btn.callback = new_game
+                view.add_item(new_game_btn)
+
+                # sending
+                channel = await bot.fetch_channel(game.channel_id)
+                await channel.send(embed=embed, view=view)
+
+            except Exception as e:
+                log(
+                    'Unable to send ending message to '\
+                    f'{game.channel_id}: {e}', level=ERROR
+                )
+            else:
+                log(f'Sent ending message to {game.channel_id}')
+
+            # removing game
+            mg.games.pop(game.channel_id)
+
+
 # events
 
 @bot.event
 async def on_ready():
     log('Ready!', level=SUCCESS)
+
+    if not check.is_running():
+        await check.start()
 
 @bot.event
 async def on_connect():
@@ -44,6 +97,7 @@ async def on_disconnect():
 @bot.event
 async def on_resumed():
     log('Resumed', level=SUCCESS)
+
 
 
 # callback
