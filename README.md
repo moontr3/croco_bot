@@ -23,7 +23,8 @@ without saying the word itself or any similar words.
 > Discord Dev bot page.
 
 > [!NOTE]
-> Use `c!sync` to sync the slash command tree (only available to bot admins)
+> Use `c!sync` to sync the slash command tree (only available to bot admins). You **need** to do this in order for slash commands
+to update properly and even appear in the first place.
 
 
 ## How to play
