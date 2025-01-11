@@ -280,7 +280,7 @@ async def sync(ctx:commands.Context):
 # take money command
 
 @bot.command()
-async def steal(ctx:commands.Context, user:discord.User, amount:str):
+async def steal(ctx:commands.Context, user:discord.User, amount:int):
     if ctx.author.id not in config.ADMINS:
         return
 
