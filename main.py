@@ -965,3 +965,8 @@ async def pay(ctx:commands.Context, user:discord.User, amount:str):
     )
 
     await ctx.reply(embed=embed)
+
+
+# running bot
+
+bot.run(TOKEN)
