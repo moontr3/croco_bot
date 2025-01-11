@@ -384,6 +384,18 @@ class Manager:
 
         log(f'Added {amount} XP to {id}', 'api')
         return self.users[id]
+
+
+    def add_moonrocks(self, id:int, amount:int) -> User:
+        '''
+        Adds moonrocks to the specified user. Returns the user.
+        '''
+        self.check_user(id)
+        self.users[id].moonrocks += amount
+        self.commit()
+
+        log(f'Added {amount} moonrocks to {id}', 'api')
+        return self.users[id]
     
 
     def transfer_moonrocks(

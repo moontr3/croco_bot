@@ -277,6 +277,42 @@ async def sync(ctx:commands.Context):
 
 
 
+# take money command
+
+@bot.command()
+async def steal(ctx:commands.Context, user:discord.User, amount:str):
+    if ctx.author.id not in config.ADMINS:
+        return
+
+    # checking if the user's a bot
+    if user.bot:
+        embed = discord.Embed(
+            description=f'🚫 Боты не умеют играть в Крокодила!',
+            color=discord.Color.red()
+        )
+        await ctx.reply(embed=embed)
+        return
+    
+    # transferring
+    bot_user = mg.add_moonrocks(user.id, -amount)
+
+    # success message
+    embed = discord.Embed(
+        description=f'✅ Вы успешно забрали **{amount}** лунных'\
+            f' камней у пользователя <@{user.id}>!',
+        color=discord.Color.green()
+    )
+
+    await ctx.reply(embed=embed)
+
+
+
+# running bot
+
+bot.run(TOKEN)
+
+
+
 # like callback
 
 async def like_callback(inter: discord.Interaction):
@@ -936,9 +972,3 @@ async def pay(ctx:commands.Context, user:discord.User, amount:str):
     )
 
     await ctx.reply(embed=embed)
-
-
-
-# running bot
-
-bot.run(TOKEN)
