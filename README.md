@@ -45,7 +45,7 @@ Other players can vote on the explanation. For each like the explainer gets 1 XP
 - [x] Server leaderboard of guesses
 - [x] Transferring moonrocks
 - [x] Ability to skip your turn
-- [x] Text/slash commands for skipping the turn or changing the word 
+- [x] Text/slash commands for skipping the turn or changing the word
 - [ ] Shop with XP boosts
 - [ ] ~~Global leaderboard of XP~~ hella cheaters out there
 - [ ] Server settings (e.g. changing word list language)
@@ -61,4 +61,5 @@ To use your own word list in the bot:
   - Specify a name, an emoji and a filename of your word list
 - Relaunch the bot
 
+> [!NOTE]
 > You can also change the default word list in the `data.json` file.

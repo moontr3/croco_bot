@@ -51,7 +51,9 @@ async def check():
                 )
     
                 # creating view
-                view = discord.ui.View()
+                view = discord.ui.View(
+                    timeout=config.GAME_LENGTH
+                )
 
                 new_game_btn = discord.ui.Button(
                     style=discord.ButtonStyle.blurple,
@@ -104,7 +106,7 @@ async def on_resumed():
 
 async def edit_finish_msg(message:discord.Message, r:api.Reaction):
     # creating new view
-    view = discord.ui.View()
+    view = discord.ui.View(timeout=config.GAME_LENGTH)
 
     btn = discord.ui.Button(
         style=discord.ButtonStyle.blurple,
@@ -173,7 +175,7 @@ async def on_message(message:discord.Message):
             message.author.id
         )
         # creating view
-        view = discord.ui.View()
+        view = discord.ui.View(timeout=config.GAME_LENGTH)
 
         btn = discord.ui.Button(
             style=discord.ButtonStyle.blurple,
@@ -409,7 +411,7 @@ async def skip_word(inter: discord.Interaction):
     log(f'{inter.user.id} changed word to {word}')
     
     # creating view
-    view = discord.ui.View()
+    view = discord.ui.View(timeout=config.GAME_LENGTH)
 
     skip_btn = discord.ui.Button(
         style=discord.ButtonStyle.gray,
@@ -458,7 +460,7 @@ async def end_turn(inter: discord.Interaction):
     log(f'{inter.user.id} removed game in {game.channel_id}')
     
     # creating view
-    view = discord.ui.View()
+    view = discord.ui.View(timeout=config.GAME_LENGTH)
 
     new_game_btn = discord.ui.Button(
         style=discord.ButtonStyle.blurple,
@@ -517,7 +519,7 @@ async def new_game(inter: discord.Interaction):
     await inter.response.send_message(embed=embed, ephemeral=True)
 
     # creating view
-    view = discord.ui.View()
+    view = discord.ui.View(timeout=config.GAME_LENGTH)
 
     view_btn = discord.ui.Button(
         style=discord.ButtonStyle.blurple,
@@ -588,7 +590,7 @@ async def changeword(ctx:commands.Context):
     log(f'{ctx.author.id} changed word to {word}')
     
     # creating view
-    view = discord.ui.View()
+    view = discord.ui.View(timeout=config.GAME_LENGTH)
 
     view_btn = discord.ui.Button(
         style=discord.ButtonStyle.blurple,
@@ -650,7 +652,7 @@ async def skip(ctx:commands.Context):
     log(f'{ctx.author.id} removed game in {game.channel_id}')
     
     # creating view
-    view = discord.ui.View()
+    view = discord.ui.View(timeout=config.GAME_LENGTH)
 
     new_game_btn = discord.ui.Button(
         style=discord.ButtonStyle.blurple,
@@ -706,7 +708,7 @@ async def start(ctx:commands.Context):
     )
 
     # creating view
-    view = discord.ui.View()
+    view = discord.ui.View(timeout=config.GAME_LENGTH)
 
     view_btn = discord.ui.Button(
         style=discord.ButtonStyle.blurple,
