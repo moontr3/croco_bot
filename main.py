@@ -306,13 +306,6 @@ async def steal(ctx:commands.Context, user:discord.User, amount:int):
     await ctx.reply(embed=embed)
 
 
-
-# running bot
-
-bot.run(TOKEN)
-
-
-
 # like callback
 
 async def like_callback(inter: discord.Interaction):
